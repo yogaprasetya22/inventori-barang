@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import { validateRole } from "@/Components/Example";
 
 export default function Delete({ id }) {
+    const { auth } = usePage().props;
     const {
         data,
         setData,
@@ -22,11 +23,11 @@ export default function Delete({ id }) {
     const handleDelete = (e) => {
         e.preventDefault();
 
-        destroy(route(`${validateRole(auth.user.id)}.barang.destroy`), {
+        destroy(route(`${validateRole(auth.user.id)}.laporan-rekap.destroy`), {
             preserveScroll: true,
             onSuccess: () => {
                 window.my_modal_3.close();
-                window.location.reload();
+                reset();
             },
             onError: (errors) => {
                 console.log(errors);
@@ -52,7 +53,7 @@ export default function Delete({ id }) {
                 <div className=" w-full flex flex-col gap-5">
                     <div className="w-full flex flex-row justify-center items-center">
                         <h1 className="text-2xl font-bold text-gray-500">
-                            Delete Barang
+                            Delete owner
                         </h1>
                     </div>
                     <form

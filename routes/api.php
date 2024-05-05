@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/generate/data/barang', [ApiDataController::class, 'index'])->name('generate.data.barang');
 Route::get('/generate/data/barang_masuk', [ApiDataController::class, 'add_barang_masuk'])->name('generate.data.add_barang_masuk');
 Route::get('/generate/data/barang_keluar', [ApiDataController::class, 'add_barang_keluar'])->name('generate.data.add_barang_keluar');
-Route::get('/scrape-category', [ApiDataController::class, 'scrape'])->name('scrape.category');
+Route::get('/scrape-category', [ApiDataController::class, 'rekap_laporan'])->name('rekap_laporan.category');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

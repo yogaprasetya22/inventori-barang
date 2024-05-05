@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('laporan_rekapitulasis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->foreignId('barang_masuk_id');
-            $table->foreignId('barang_keluar_id');
-            $table->foreignId('barang_id');
             $table->string('judul_rekap');
             $table->date('tanggal_rekap');
             $table->string('keterangan');

@@ -14,13 +14,10 @@ class BarangKeluar extends Model
     {
         return $this->belongsTo(Barang::class);
     }
+
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
     }
 
-    public function laporanRekapitulasi()
-    {
-        return $this->hasMany(LaporanRekapitulasi::class);
-    }
 }

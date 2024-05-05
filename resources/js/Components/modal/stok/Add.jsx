@@ -4,10 +4,10 @@ import TextInput from "@/Components/ui/TextInput";
 import React from "react";
 import { useForm, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
-import { formatRupiah } from "@/Components/Example";
+import { formatRupiah, validateRole } from "@/Components/Example";
 
 export default function Add() {
-    const { kategori } = usePage().props;
+    const { kategori, auth } = usePage().props;
     const [srcImg, setSrcImg] = React.useState(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         file: "",
@@ -41,7 +41,7 @@ export default function Add() {
         formData.append("keterangan", data.keterangan);
         formData.append("kategori_id", data.kategori_id);
 
-        post(route("admin.barang.store"), formData, {
+        post(route(`${validateRole(auth.user.id)}.barang.store`), formData, {
             // Tambahkan opsi untuk mengatur header Content-Type
             headers: {
                 "Content-Type": "multipart/form-data",

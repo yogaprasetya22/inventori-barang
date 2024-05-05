@@ -6,13 +6,14 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
-export default function DataMekanik({ data_mekanik }) {
+export default function DataMekanik({ data_mekanik: data }) {
+    const [data_mekanik, setDataMekanik] = useState(data);
     const [itemOffset, setItemOffset] = useState(0);
     const [currentItems, setCurrentItems] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [Loading, setLoading] = useState(false);
     const [page, setPage] = useState(5);
-
+    const [search, setSearch] = useState("");
     const [dataModal, setDataModal] = useState([]);
 
     useEffect(() => {
@@ -38,6 +39,18 @@ export default function DataMekanik({ data_mekanik }) {
 
         setItemOffset(newOffset);
     };
+
+    const handleSearch = () => {
+        const result = data.filter((item) => {
+            return (
+                item.name.toLowerCase().includes(search.toLowerCase()) ||
+                item.email.toLowerCase().includes(search.toLowerCase())
+            );
+        });
+
+        setDataMekanik(result);
+    }
+
     return (
         <Layout>
             <Add />
@@ -52,9 +65,9 @@ export default function DataMekanik({ data_mekanik }) {
                                 value={page}
                                 onChange={(e) => setPage(e.target.value)}
                             >
-                                {new Array(5).fill(0).map((item, index) => (
-                                    <option key={index} value={index + 1}>
-                                        {index + 1}
+                                {[5, 10, 15, 20].map((item, index) => (
+                                    <option key={index} value={item}>
+                                        {item}
                                     </option>
                                 ))}
                             </select>{" "}
@@ -64,8 +77,10 @@ export default function DataMekanik({ data_mekanik }) {
                                 type="text"
                                 className="input input-bordered"
                                 placeholder="Search"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                             />
-                            <button className="btn">
+                            <button className="btn" onClick={handleSearch}>
                                 <i className="fas fa-search"></i>{" "}
                             </button>
                         </div>
@@ -106,17 +121,29 @@ export default function DataMekanik({ data_mekanik }) {
                         <table className="table border">
                             <thead>
                                 <tr className="font-bold  text-lg text-black">
-                                    <th className="text-gray-500 text-center text-md border-x-2">id</th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">nama</th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">email</th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">role</th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">aksi</th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        id
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        nama
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        email
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        role
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        aksi
+                                    </th>
                                 </tr>
                             </thead>
                             {currentItems?.map((item, index) => (
                                 <tbody key={index}>
                                     <tr>
-                                        <td className="font-bold border-x-2">{item.id}</td>
+                                        <td className="font-bold border-x-2">
+                                            {item.id}
+                                        </td>
                                         <td className="font-bold border-x-2">
                                             {item.name}
                                         </td>

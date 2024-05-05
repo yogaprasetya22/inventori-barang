@@ -6,13 +6,14 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
-export default function DataOwner({ data_owner }) {
+export default function DataOwner({ data_owner: data }) {
+    const [data_owner, setDataOwner] = useState(data);
     const [itemOffset, setItemOffset] = useState(0);
     const [currentItems, setCurrentItems] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [Loading, setLoading] = useState(false);
     const [page, setPage] = useState(5);
-
+    const [search, setSearch] = useState("");
     const [dataModal, setDataModal] = useState([]);
 
     useEffect(() => {
@@ -38,6 +39,17 @@ export default function DataOwner({ data_owner }) {
 
         setItemOffset(newOffset);
     };
+
+    const handleSearch = () => {
+        const result = data.filter((item) => {
+            return (
+                item.name.toLowerCase().includes(search.toLowerCase()) ||
+                item.email.toLowerCase().includes(search.toLowerCase())
+            );
+        });
+
+        setDataOwner(result);
+    };
     return (
         <Layout>
             <Add />
@@ -52,9 +64,9 @@ export default function DataOwner({ data_owner }) {
                                 value={page}
                                 onChange={(e) => setPage(e.target.value)}
                             >
-                                {new Array(5).fill(0).map((item, index) => (
-                                    <option key={index} value={index + 1}>
-                                        {index + 1}
+                                {[5, 10, 15, 20].map((item, index) => (
+                                    <option key={index} value={item}>
+                                        {item}
                                     </option>
                                 ))}
                             </select>{" "}
@@ -64,8 +76,10 @@ export default function DataOwner({ data_owner }) {
                                 type="text"
                                 className="input input-bordered"
                                 placeholder="Search"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                             />
-                            <button className="btn">
+                            <button className="btn" onClick={handleSearch}>
                                 <i className="fas fa-search"></i>{" "}
                             </button>
                         </div>

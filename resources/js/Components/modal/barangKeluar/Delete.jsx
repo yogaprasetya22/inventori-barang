@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
+import { validateRole } from "@/Components/Example";
 
 export default function Delete({ id }) {
+    const { auth } = usePage().props;
     const {
         data,
         setData,
@@ -21,7 +23,7 @@ export default function Delete({ id }) {
     const handleDelete = (e) => {
         e.preventDefault();
 
-        destroy(route("admin.barang-keluar.destroy"), {
+        destroy(route(`${validateRole(auth.user.id)}.barang-keluar.destroy`), {
             preserveScroll: true,
             onSuccess: () => {
                 window.my_modal_3.close();

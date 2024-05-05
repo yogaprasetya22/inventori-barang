@@ -4,9 +4,10 @@ import TextInput from "@/Components/ui/TextInput";
 import React from "react";
 import { useForm, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
+import { validateRole } from "@/Components/Example";
 
 export default function Add() {
-    const { barang } = usePage().props;
+    const { barang, auth } = usePage().props;
     const [dataSrc, setDataSrc] = React.useState(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         barang_id: "",
@@ -28,7 +29,7 @@ export default function Add() {
     const handleAddowner = (e) => {
         e.preventDefault();
 
-        post(route("admin.barang-keluar.store"), {
+        post(route(`${validateRole(auth.user.id)}.barang-keluar.store`), {
             preserveScroll: true,
             onSuccess: () => {
                 window.my_modal_1.close();

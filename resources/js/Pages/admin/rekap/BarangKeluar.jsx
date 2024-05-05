@@ -1,40 +1,34 @@
-import Add from "@/Components/modal/stok/Add";
-import Delete from "@/Components/modal/stok/Delete";
-import Update from "@/Components/modal/stok/Update";
 import Layout from "@/Layouts/Layout";
+import { Link } from "@inertiajs/react";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
-export default function StokBarang({ data_barang: data }) {
-    const [data_barang, setDataBarang] = useState(data);
+export default function BarangKeluar({ data_barang_keluar: data }) {
+    const [data_barang_keluar, setDataBarangKeluar] = useState(data);
+    const [date, setDate] = useState(new Date());
     const [itemOffset, setItemOffset] = useState(0);
     const [currentItems, setCurrentItems] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [Loading, setLoading] = useState(false);
     const [page, setPage] = useState(5);
+    const [search, setSearch] = useState("");
     const [dataModal, setDataModal] = useState([]);
 
-    const [search, setSearch] = useState("");
-
-    const handleFilter = () => {
-        const kuantitasDibawah10 = data_barang.filter(
-            (item) => item.kuantitas < 10
-        );
-        setDataBarang(kuantitasDibawah10);
-    };
 
     useEffect(() => {
         setLoading(true);
+
         const endOffset = parseInt(itemOffset) + parseInt(page);
-        const sortData = data_barang
+        const sortData = data_barang_keluar
             ?.sort((a, b) => {
                 return a.id - b.id;
             })
             .slice(itemOffset, endOffset);
         setCurrentItems(sortData);
-        setPageCount(Math.ceil(data_barang?.length / page));
+        setPageCount(Math.ceil(data_barang_keluar?.length / page));
         setLoading(false);
-    }, [itemOffset, data_barang, page]);
+    }, [itemOffset, data_barang_keluar, page, date]);
 
     const handlePageClick = (event) => {
         window.scrollTo({
@@ -42,31 +36,51 @@ export default function StokBarang({ data_barang: data }) {
             behavior: "smooth",
         });
 
-        const newOffset = (event.selected * page) % data_barang?.length;
+        const newOffset = (event.selected * page) % data_barang_keluar?.length;
 
         setItemOffset(newOffset);
     };
 
+    const handleDate = (e) => {
+        setDate(e.target.value);
+    };
+
+    const getTodayDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+
+        // Pad single digit month and day with leading zero if needed
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+
+        return `${year}-${month}-${day}`;
+    };
+
     const handleSearch = () => {
-        const result = data.filter((item) => {
+        const result = data_barang_keluar?.filter((item) => {
             return (
                 item.nama_barang.toLowerCase().includes(search.toLowerCase()) ||
                 item.kategori.nama_kategori
                     .toLowerCase()
                     .includes(search.toLowerCase()) ||
-                item.harga.toString().includes(search) ||
-                item.kuantitas.toString().includes(search) ||
-                item.keterangan.toLowerCase().includes(search.toLowerCase())
+                item.barang.harga
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                item.kuantitas.toLowerCase().includes(search.toLowerCase())
             );
         });
-        setDataBarang(result);
+
+        setDataBarangKeluar(result);
     };
 
     return (
         <Layout>
-            <Add />
-            {dataModal && <Update data={dataModal} />}
-            {dataModal && <Delete id={dataModal.id} />}
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between px-3 py-2 bg-white rounded-md shadow-md">
                     <div className="flex  px-5 py-3 gap-10">
@@ -82,18 +96,6 @@ export default function StokBarang({ data_barang: data }) {
                                     </option>
                                 ))}
                             </select>{" "}
-                            <button
-                                className="btn text-white bg-red-400"
-                                onClick={handleFilter}
-                            >
-                                filter kuantitas dibawah 10
-                            </button>
-                            <button
-                                className="btn text-white bg-blue-400"
-                                onClick={() => setDataBarang(data)}
-                            >
-                                reset data
-                            </button>
                         </div>
                         <div className="flex flex-row items-center justify-center gap-2">
                             <input
@@ -109,12 +111,19 @@ export default function StokBarang({ data_barang: data }) {
                         </div>
                     </div>
                     <div className="flex items-center gap-2 px-5 py-3">
-                        <button
-                            onClick={() => window.my_modal_1.show()}
-                            className="btn bg-indigo-400/90 text-white rounded-md"
+                        <p className="text-gray-600 rounded-md text-xl font-extrabold">
+                            {moment(
+                                data[0].laporan_rekapitulasi.tanggal_rekap
+                            ).format("LL")}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 px-5 py-3">
+                        <Link
+                            href="/admin/laporan-rekap"
+                            className="btn bg-red-400/90 text-white rounded-md"
                         >
-                            Create New
-                        </button>
+                            Back
+                        </Link>
                     </div>
                 </div>{" "}
                 <div className="bg-white flex flex-col gap-10 rounded-xl  shadow-md">
@@ -141,82 +150,39 @@ export default function StokBarang({ data_barang: data }) {
                                 activeClassName="bg-transparan border border-blue-800 text-blue-800"
                             />
                         </div>
-                        <table className="table border ">
+                        <table className="table">
                             <thead>
                                 <tr className="font-bold text-lg text-black">
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Id
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        nama barang
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Foto
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        kategori
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Harga
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Kuantitas
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        keterangan
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        aksi
-                                    </th>
+                                    <th>id</th>
+                                    <th>nama barang</th>
+                                    <th>foto</th>
+                                    <th>kategori</th>
+                                    <th>harga</th>
+                                    <th>barang keluar</th>
                                 </tr>
                             </thead>
                             {currentItems?.map((item, index) => (
                                 <tbody key={index}>
                                     <tr>
-                                        <td className="font-bold border-x-2">
-                                            {item.id}
-                                        </td>
-                                        <td className="font-bold border-x-2 max-w-[12rem]">
+                                        <td className="font-bold">{item.id}</td>
+                                        <td className="font-bold max-w-[12rem]">
                                             {item.nama_barang}
                                         </td>
-                                        <td className="font-bold border-x-2">
+                                        <td className="font-bold">
                                             <img
-                                                src={item.url_gambar}
+                                                src={item.barang.url_gambar}
                                                 alt=""
                                                 className="max-w-[5rem]"
                                             />
                                         </td>
-                                        <td className="font-bold border-x-2">
+                                        <td className="font-bold">
                                             {item.kategori.nama_kategori}
                                         </td>
-                                        <td className="font-bold border-x-2">
-                                            {item.harga}
+                                        <td className="font-bold">
+                                            {item.barang.harga}
                                         </td>
-                                        <td className="font-bold border-x-2">
+                                        <td className="font-bold">
                                             {item.kuantitas}
-                                        </td>
-                                        <td className="font-bold border-x-2 max-w-[15rem]">
-                                            {item.keterangan}
-                                        </td>
-                                        <td className="flex flex-row gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    window.my_modal_2.show();
-                                                    setDataModal(item);
-                                                }}
-                                                className="btn bg-yellow-400"
-                                            >
-                                                <i className="fas fa-edit text-white"></i>
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    window.my_modal_3.show();
-                                                    setDataModal(item);
-                                                }}
-                                                className="btn bg-red-400"
-                                            >
-                                                <i className="fas fa-trash text-white"></i>
-                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>

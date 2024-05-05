@@ -21,7 +21,13 @@ export const validateHeader = (role) => {
 };
 
 export function formatRupiah(angka, prefix) {
-    var number_string = angka.replace(/[^,\d]/g, "").toString(),
+    // Periksa apakah angka negatif
+    var isNegative = angka < 0;
+
+    // Ambil nilai absolut dari angka
+    var absAngka = Math.abs(angka);
+
+    var number_string = absAngka.toString().replace(/[^,\d]/g, ""),
         split = number_string.split(","),
         sisa = split[0].length % 3,
         rupiah = split[0].substr(0, sisa),
@@ -33,5 +39,11 @@ export function formatRupiah(angka, prefix) {
     }
 
     rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+
+    // Tambahkan tanda minus jika angka negatif
+    if (isNegative) {
+        rupiah = "-" + rupiah;
+    }
+
     return prefix == undefined ? rupiah : rupiah ? "Rp" + rupiah : "";
 }

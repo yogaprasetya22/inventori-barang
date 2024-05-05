@@ -1,27 +1,22 @@
-import Add from "@/Components/modal/stok/Add";
-import Delete from "@/Components/modal/stok/Delete";
-import Update from "@/Components/modal/stok/Update";
+import Add from "@/Components/modal/rekap/Add";
+import Delete from "@/Components/modal/rekap/Delete";
+import Update from "@/Components/modal/rekap/Update";
 import Layout from "@/Layouts/Layout";
+import moment from "moment/moment";
+import "moment/locale/id";
+moment.locale("id");
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
+import { Link } from "@inertiajs/react";
 
-export default function StokBarang({ data_barang: data }) {
+export default function LaporanRekap({ data_laporan_rekap: data }) {
     const [data_barang, setDataBarang] = useState(data);
+    const [dataModal, setDataModal] = useState([]);
     const [itemOffset, setItemOffset] = useState(0);
     const [currentItems, setCurrentItems] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [Loading, setLoading] = useState(false);
     const [page, setPage] = useState(5);
-    const [dataModal, setDataModal] = useState([]);
-
-    const [search, setSearch] = useState("");
-
-    const handleFilter = () => {
-        const kuantitasDibawah10 = data_barang.filter(
-            (item) => item.kuantitas < 10
-        );
-        setDataBarang(kuantitasDibawah10);
-    };
 
     useEffect(() => {
         setLoading(true);
@@ -47,21 +42,6 @@ export default function StokBarang({ data_barang: data }) {
         setItemOffset(newOffset);
     };
 
-    const handleSearch = () => {
-        const result = data.filter((item) => {
-            return (
-                item.nama_barang.toLowerCase().includes(search.toLowerCase()) ||
-                item.kategori.nama_kategori
-                    .toLowerCase()
-                    .includes(search.toLowerCase()) ||
-                item.harga.toString().includes(search) ||
-                item.kuantitas.toString().includes(search) ||
-                item.keterangan.toLowerCase().includes(search.toLowerCase())
-            );
-        });
-        setDataBarang(result);
-    };
-
     return (
         <Layout>
             <Add />
@@ -82,28 +62,14 @@ export default function StokBarang({ data_barang: data }) {
                                     </option>
                                 ))}
                             </select>{" "}
-                            <button
-                                className="btn text-white bg-red-400"
-                                onClick={handleFilter}
-                            >
-                                filter kuantitas dibawah 10
-                            </button>
-                            <button
-                                className="btn text-white bg-blue-400"
-                                onClick={() => setDataBarang(data)}
-                            >
-                                reset data
-                            </button>
                         </div>
                         <div className="flex flex-row items-center justify-center gap-2">
                             <input
                                 type="text"
                                 className="input input-bordered "
                                 placeholder="Search"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
                             />
-                            <button className="btn" onClick={handleSearch}>
+                            <button className="btn">
                                 <i className="fas fa-search"></i>{" "}
                             </button>
                         </div>
@@ -148,22 +114,22 @@ export default function StokBarang({ data_barang: data }) {
                                         Id
                                     </th>
                                     <th className="text-gray-500 text-center text-md border-x-2">
-                                        nama barang
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Foto
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        kategori
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Harga
-                                    </th>
-                                    <th className="text-gray-500 text-center text-md border-x-2">
-                                        Kuantitas
+                                        judul rekap
                                     </th>
                                     <th className="text-gray-500 text-center text-md border-x-2">
                                         keterangan
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        tanggal rekap
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        barang
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        barang masuk
+                                    </th>
+                                    <th className="text-gray-500 text-center text-md border-x-2">
+                                        barang keluar
                                     </th>
                                     <th className="text-gray-500 text-center text-md border-x-2">
                                         aksi
@@ -177,26 +143,39 @@ export default function StokBarang({ data_barang: data }) {
                                             {item.id}
                                         </td>
                                         <td className="font-bold border-x-2 max-w-[12rem]">
-                                            {item.nama_barang}
+                                            {item.judul_rekap}
                                         </td>
                                         <td className="font-bold border-x-2">
-                                            <img
-                                                src={item.url_gambar}
-                                                alt=""
-                                                className="max-w-[5rem]"
-                                            />
-                                        </td>
-                                        <td className="font-bold border-x-2">
-                                            {item.kategori.nama_kategori}
-                                        </td>
-                                        <td className="font-bold border-x-2">
-                                            {item.harga}
-                                        </td>
-                                        <td className="font-bold border-x-2">
-                                            {item.kuantitas}
-                                        </td>
-                                        <td className="font-bold border-x-2 max-w-[15rem]">
                                             {item.keterangan}
+                                        </td>
+                                        <td className="font-bold border-x-2">
+                                            {moment(item.tanggal_rekap).format(
+                                                "LL"
+                                            )}
+                                        </td>
+                                        <td className="font-bold border-x-2 text-indigo-600/80">
+                                            <Link
+                                                href={`/mekanik/laporan-rekap/rekap-barang/${item.id}`}
+                                            >
+                                                {item.rekap_stok_barang.length}
+                                            </Link>
+                                        </td>
+                                        <td className="font-bold border-x-2 text-indigo-600/80 max-w-[15rem]">
+                                            <Link
+                                                href={`/mekanik/laporan-rekap/rekap-barang-masuk/${item.id}`}
+                                            >
+                                                {item.rekap_barang_masuk.length}
+                                            </Link>
+                                        </td>
+                                        <td className="font-bold border-x-2 text-indigo-600/80 max-w-[15rem]">
+                                            <Link
+                                                href={`/mekanik/laporan-rekap/rekap-barang-keluar/${item.id}`}
+                                            >
+                                                {
+                                                    item.rekap_barang_keluar
+                                                        .length
+                                                }
+                                            </Link>
                                         </td>
                                         <td className="flex flex-row gap-2">
                                             <button

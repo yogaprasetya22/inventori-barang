@@ -6,6 +6,9 @@ use App\Models\Barang;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 use App\Models\Kategori;
+use App\Models\LaporanRekapitulasi;
+use App\Models\Rekapitulasi;
+use App\Models\RekapStokBarang;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -290,14 +293,55 @@ class ApiDataController extends Controller
      * Show the form for creating a new resource.
      */
 
-    public function scrape()
+    public function rekap_laporan()
     {
-        $supplier = Supplier::with('kategori')->get();
+        $id = 1;
+        $data_barang = Barang::with('kategori')->get();
+        $tanggal_sekarang = Carbon::now()->timezone('Asia/Jakarta')->format('Y-m-d');
+        $laporan_rekapitulasi_isEmpty = LaporanRekapitulasi::all();
+        $barang_masuk = BarangMasuk::with('barang.kategori')->whereDate('tanggal_masuk', $tanggal_sekarang)->get();
+        $barang_keluar = BarangKeluar::with('barang.kategori')->whereDate('tanggal_keluar', $tanggal_sekarang)->get();
+        if ($laporan_rekapitulasi_isEmpty->isEmpty()) {
+            $data = [];
+            $laporan_rekapitulasi = LaporanRekapitulasi::create([
+                'user_id' => $id,
+                'judul_rekap' => 'Rekapitulasi Laporan Barang',
+                'tanggal_rekap' => $tanggal_sekarang,
+                'keterangan' => 'Rekapitulasi laporan barang yang ada di toko',
+            ]);
+            for ($i = 0; $data_barang->count() > $i; $i++) {
+                $data[] = [
+                    'laporan_rekapitulasi_id' => $laporan_rekapitulasi->id,
+                    'url_gambar' => $data_barang[$i]->url_gambar,
+                    'nama_barang' => $data_barang[$i]->nama_barang,
+                    'kuantitas' => $data_barang[$i]->kuantitas,
+                    'harga' => $data_barang[$i]->harga,
+                    'keterangan' => $data_barang[$i]->keterangan,
+                    'kategori_id' => $data_barang[$i]->kategori->id,
+                    'created_at' => now(),
+                ];
+            }
+            RekapStokBarang::insert($data);
 
-        return response()->json([
-            'message' => 'Data berhasil di-generate',
-            'data' => $supplier,
-        ]);
+            // update barang masuk laporan_rekapitulasi_id
+            foreach ($barang_masuk as $item) {
+                BarangMasuk::where('id', $item->id)->update(['laporan_rekapitulasi_id' => $laporan_rekapitulasi->id]);
+            }
+
+            // update barang keluar laporan_rekapitulasi_id
+            foreach ($barang_keluar as $item) {
+                BarangKeluar::where('id', $item->id)->update(['laporan_rekapitulasi_id' => $laporan_rekapitulasi->id]);
+            }
+
+            return response()->json([
+                'message' => 'Data berhasil di-generate',
+                'data' => $data,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Data sudah ada',
+            ]);
+        }
     }
 
 

@@ -4,9 +4,10 @@ import TextInput from "@/Components/ui/TextInput";
 import React from "react";
 import { useForm, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
+import { validateRole } from "@/Components/Example";
 
 export default function Update({ data: data_barang_masuk }) {
-    const { barang } = usePage().props;
+    const { barang, auth } = usePage().props;
     const [dataSrc, setDataSrc] = React.useState(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         id: "",
@@ -39,7 +40,7 @@ export default function Update({ data: data_barang_masuk }) {
     const handleAddowner = (e) => {
         e.preventDefault();
 
-        post(route("admin.barang-keluar.update"), {
+        post(route(`${validateRole(auth.user.id)}.barang-keluar.update`), {
             preserveScroll: true,
             onSuccess: () => {
                 window.my_modal_2.close();

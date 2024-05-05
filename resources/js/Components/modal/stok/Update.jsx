@@ -4,11 +4,11 @@ import TextInput from "@/Components/ui/TextInput";
 import React from "react";
 import { useForm, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
-import { formatRupiah } from "@/Components/Example";
+import { formatRupiah, validateRole } from "@/Components/Example";
 import axios from "axios";
 
 export default function Update({ data: data_stok }) {
-    const { kategori } = usePage().props;
+    const { kategori, auth } = usePage().props;
     const [srcImg, setSrcImg] = React.useState(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         id: "",
@@ -56,7 +56,7 @@ export default function Update({ data: data_stok }) {
         formData.append("file", data.file || null);
         setData({ ...data, file: formData });
 
-        post(route("admin.barang.update"), {
+        post(route(`${validateRole(auth.user.id)}.barang.update`), {
             onSuccess: () => {
                 window.my_modal_2.close();
                 window.location.reload();

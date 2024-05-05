@@ -10,19 +10,19 @@ class LaporanRekapitulasi extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public function barangMasuk()
+    public function rekap_stok_barang()
     {
-        return $this->belongsTo(BarangMasuk::class);
+        return $this->hasMany(RekapStokBarang::class);
     }
 
-    public function barangKeluar()
+    public function rekap_barang_masuk()
     {
-        return $this->belongsTo(BarangKeluar::class);
+        return $this->hasMany(RekapBarangMasuk::class);
     }
 
-    public function barang()
+    public function rekap_barang_keluar()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->hasMany(RekapBarangKeluar::class);
     }
 
     public function user()

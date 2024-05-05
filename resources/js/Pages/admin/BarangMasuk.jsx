@@ -6,14 +6,15 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
-export default function BarangMasuk({ data_barang_masuk }) {
+export default function BarangMasuk({ data_barang_masuk: data }) {
+    const [data_barang_masuk, setDataBarangMasuk] = useState(data);
     const [date, setDate] = useState(new Date());
     const [itemOffset, setItemOffset] = useState(0);
     const [currentItems, setCurrentItems] = useState([]);
     const [pageCount, setPageCount] = useState(0);
     const [Loading, setLoading] = useState(false);
     const [page, setPage] = useState(5);
-
+    const [search, setSearch] = useState("");
     const [dataModal, setDataModal] = useState([]);
 
     useEffect(() => {
@@ -69,6 +70,26 @@ export default function BarangMasuk({ data_barang_masuk }) {
         return `${year}-${month}-${day}`;
     };
 
+    const handleSearch = () => {
+        const result = data.filter((item) => {
+            return (
+                item.nama_barang.toLowerCase().includes(search.toLowerCase()) ||
+                item.kategori.nama_kategori
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                item.supplier.nama_supplier
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                item.barang.harga
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                item.kuantitas.toLowerCase().includes(search.toLowerCase())
+            );
+        });
+
+        setDataBarangMasuk(result);
+    };
+
     return (
         <Layout>
             <Add />
@@ -83,9 +104,9 @@ export default function BarangMasuk({ data_barang_masuk }) {
                                 value={page}
                                 onChange={(e) => setPage(e.target.value)}
                             >
-                                {new Array(5).fill(0).map((item, index) => (
-                                    <option key={index} value={index + 1}>
-                                        {index + 1}
+                                {[5, 10, 15, 20].map((item, index) => (
+                                    <option key={index} value={item}>
+                                        {item}
                                     </option>
                                 ))}
                             </select>{" "}
@@ -104,8 +125,10 @@ export default function BarangMasuk({ data_barang_masuk }) {
                                 type="text"
                                 className="input input-bordered"
                                 placeholder="Search"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                             />
-                            <button className="btn">
+                            <button className="btn" onClick={handleSearch}>
                                 <i className="fas fa-search"></i>{" "}
                             </button>
                         </div>

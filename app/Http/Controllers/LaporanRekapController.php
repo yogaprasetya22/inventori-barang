@@ -122,16 +122,33 @@ class LaporanRekapController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        // validation
+        $request->validate([
+            'judul_rekap' => 'required',
+            'keterangan' => 'required',
+        ]);
+
+        //  update data laporan
+        $laporan_rekapitulasi = LaporanRekapitulasi::find($request->id);
+        $laporan_rekapitulasi->update([
+            'judul_rekap' => $request->judul_rekap,
+            'keterangan' => $request->keterangan,
+        ]);
+
+        return redirect()->back()->with('success', 'Data berhasil diupdate');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        // delete data laporan
+        $laporan_rekapitulasi = LaporanRekapitulasi::find($request->id);
+        $laporan_rekapitulasi->delete();
+
+        return redirect()->back()->with('success', 'Data berhasil dihapus');
     }
 }
